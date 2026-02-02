@@ -1,6 +1,17 @@
 name: 'Terraform'
 
 on:
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        description: 'Terraform action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
   push:
     branches: [ "main" ]
 
@@ -31,10 +42,13 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
+        if: github.event.inputs.terraform_action == 'plan'
         run: terraform plan -input=false
 
       - name: Terraform Destroy
+        if: github.event.inputs.terraform_action == 'destroy'
         run: terraform destroy -auto-approve -input=false
 
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve -input=false
+      - name: Terraform Apply
+        if: github.event.inputs.terraform_action == 'apply'
+        run: terraform apply -auto-approve -input=false
