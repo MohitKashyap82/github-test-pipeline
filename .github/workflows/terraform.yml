@@ -4,47 +4,34 @@ on:
   push:
     branches: [ "main" ]
 
-
 jobs:
   terraform:
     name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    # AWS Credentials defined at the job level
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    runs-on: ubuntu-latest
-    environment: production
-
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
-    - name: Terraform Init 
-      uses: hashicorp/terraform-github-actions@master
-      with:
-        tf_action_version: '1.7.6'
-        tf_actions_subcommand: 'init' 
-        tf_actions_working_dir: '.'
-        tf_action_comment: 'true'
+      # This replaces the buggy/deprecated action
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.6'
 
+      
 
-    - name: Terraform Plan
-      uses: hashicorp/terraform-github-actions@master
-      with:
-        tf_action_version: '1.7.6'
-        tf_actions_subcommand: 'plan'
-        tf_actions_working_dir: '.'
-        tf_action_comment: 'true'
+      - name: Terraform Init
+        run: terraform init
 
+      - name: Terraform Plan
+        run: terraform plan -input=false
 
-    - name: Terraform Apply 
-      uses: hashicorp/terraform-github-actions@master
-      with:
-        tf_action_version: '1.7.6'
-        tf_actions_subcommand: 'apply -auto-approve' 
-        tf_actions_working_dir: '.'
-        tf_action_comment: 'true'
-
-        
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false
