@@ -1,0 +1,26 @@
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+
+# Variable files that may contain secrets
+*.tfvars
+*.tfvars.json
+terraform.tfvars
+terraform.tfvars.local
+
+# Optional: lock file (committing is recommended for reproducible builds)
+# .terraform.lock.hcl
+
+# SSH keys and certs
+*.pem
+*.key
+
+# Environment files
+.env
